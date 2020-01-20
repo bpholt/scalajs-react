@@ -3,6 +3,7 @@ package japgolly.scalajs.react.effects
 import cats.effect.laws.discipline.SyncTests
 import cats.effect.laws.util.{TestContext, TestInstances}
 import cats.kernel.Eq
+import cats.laws.discipline.ParallelTests
 import cats.tests.CatsSuite
 import japgolly.scalajs.react.CallbackTo
 import japgolly.scalajs.react.effects.CallbackToEffects._
@@ -17,4 +18,10 @@ final class CallbackToEffectsSpec extends CatsSuite with TestInstances with Call
     }
 
   checkAll("Sync[CallbackTo]", SyncTests[CallbackTo].sync[Int, Int, Int])
+
+  implicit def eqParallelF[A](implicit A: Eq[A], ec: TestContext): Eq[CallbackToEffects.callbackToParallel.F[A]] =
+    eqCallback[A].asInstanceOf[Eq[CallbackToEffects.callbackToParallel.F[A]]]
+
+  checkAll("Parallel[CallbackTo]", ParallelTests[CallbackTo].parallel[Int, String])
+
 }

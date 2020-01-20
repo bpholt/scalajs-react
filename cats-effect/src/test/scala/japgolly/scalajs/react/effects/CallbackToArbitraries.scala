@@ -23,4 +23,10 @@ trait CallbackToArbitraries {
 
   def genBindSuspend[A: Arbitrary: Cogen]: Gen[CallbackTo[A]] =
     arbitrary[A].map(CallbackTo.apply(_).flatMap(CallbackTo.pure))
+
+  implicit def arbParallelCallbackToF[T: Arbitrary : Cogen]: Arbitrary[CallbackToEffects.callbackToParallel.F[T]] = Arbitrary(genParallelCallbackToF[T])
+
+  def genParallelCallbackToF[T: Arbitrary : Cogen]: Gen[CallbackToEffects.callbackToParallel.F[T]] =
+    arbitrary[CallbackTo[T]].asInstanceOf[Gen[CallbackToEffects.callbackToParallel.F[T]]]
+
 }

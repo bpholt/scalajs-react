@@ -2,7 +2,7 @@ package japgolly.scalajs.react.effects
 
 import cats.effect.{Effect, ExitCase, IO, SyncIO}
 import cats.{MonadError, Parallel}
-import japgolly.scalajs.react.{AsyncCallback, Callback, CatsReact}
+import japgolly.scalajs.react.{AsyncCallback, Callback, CallbackTo, CatsReact}
 
 import scala.util.{Either, Failure, Success}
 

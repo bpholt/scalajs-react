@@ -1,8 +1,8 @@
 package japgolly.scalajs.react.effects
 
-import cats.effect.{Bracket, ExitCase, Sync}
-import cats.{Defer, MonadError}
-import japgolly.scalajs.react.{AsyncCallback, CallbackTo, CatsReact}
+import cats.effect.{ExitCase, Sync}
+import cats.{MonadError, Parallel}
+import japgolly.scalajs.react.{CallbackTo, CatsReact}
 
 object CallbackToEffects {
   private val callbackToMonadError: MonadError[CallbackTo, Throwable] =
@@ -28,4 +28,6 @@ object CallbackToEffects {
     override def suspend[A](thunk: => CallbackTo[A]): CallbackTo[A] =
       CallbackTo.byName(thunk)
   }
+
+  implicit val callbackToParallel: Parallel[CallbackTo] = Parallel.identity
 }
