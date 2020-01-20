@@ -54,4 +54,10 @@ trait AsyncCallbackArbitraries extends CallbackToArbitraries {
       f1 <- arbitrary[A => A]
       f2 <- arbitrary[A => A]
     } yield ioa.map(f1).map(f2)
+
+  implicit def arbParallelF[T: Arbitrary : Cogen]: Arbitrary[AsyncCallbackEffects.asyncCallbackParallel.F[T]] = Arbitrary(genParallelF[T])
+
+  def genParallelF[T: Arbitrary : Cogen]: Gen[AsyncCallbackEffects.asyncCallbackParallel.F[T]] =
+    arbitrary[AsyncCallback[T]].asInstanceOf[Gen[AsyncCallbackEffects.asyncCallbackParallel.F[T]]]
+
 }

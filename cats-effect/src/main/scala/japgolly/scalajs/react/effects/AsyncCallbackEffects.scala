@@ -1,7 +1,7 @@
 package japgolly.scalajs.react.effects
 
-import cats.effect.{Async, Bracket, Effect, ExitCase, IO, LiftIO, Sync, SyncIO}
-import cats.{Defer, MonadError}
+import cats.effect.{Effect, ExitCase, IO, SyncIO}
+import cats.{MonadError, Parallel}
 import japgolly.scalajs.react.{AsyncCallback, Callback, CatsReact}
 
 import scala.util.{Either, Failure, Success}
@@ -16,8 +16,8 @@ object AsyncCallbackEffects {
     override def bracketCase[A, B](acquire: AsyncCallback[A])(use: A => AsyncCallback[B])(release: (A, ExitCase[Throwable]) => AsyncCallback[Unit]): AsyncCallback[B] =
       acquire.flatMap { a =>
         use(a).attempt.flatMap {
-          case Right(b) => release(a, ExitCase.Completed).ret(b)
-          case Left(e)  => release(a, ExitCase.Error(e)) >> AsyncCallback.throwException(e)
+          case Right(b) => release(a, ExitCase.Completed) >> asyncCallbackMonadError.pure(b)
+          case Left(e)  => release(a, ExitCase.Error(e)) >> asyncCallbackMonadError.raiseError(e)
         }
       }
     override def pure[A](x: A): AsyncCallback[A] = asyncCallbackMonadError.pure(x)
@@ -65,4 +65,6 @@ object AsyncCallbackEffects {
       )
     }
   }
+
+  implicit val asyncCallbackParallel: Parallel[AsyncCallback] = Parallel.identity
 }

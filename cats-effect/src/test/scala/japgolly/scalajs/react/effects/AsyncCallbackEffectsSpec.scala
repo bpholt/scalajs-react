@@ -6,8 +6,10 @@ import cats.kernel.Eq
 import cats.tests.CatsSuite
 import japgolly.scalajs.react.effects.AsyncCallbackEffects._
 import japgolly.scalajs.react.AsyncCallback
-
 import cats.effect.laws.discipline.arbitrary._
+import cats.laws.discipline.arbitrary._
+import cats.laws.discipline.ParallelTests
+import japgolly.scalajs.react
 
 final class AsyncCallbackEffectsSpec extends CatsSuite with TestInstances with AsyncCallbackArbitraries {
   implicit val ec: TestContext = TestContext()
@@ -19,4 +21,10 @@ final class AsyncCallbackEffectsSpec extends CatsSuite with TestInstances with A
     }
 
   checkAll("Effect[AsyncCallback]", EffectTests[AsyncCallback].effect[Int, Int, Int])
+
+  implicit def eqParallelF[A](implicit A: Eq[A], ec: TestContext): Eq[AsyncCallbackEffects.asyncCallbackParallel.F[A]] =
+    eqCallback[A].asInstanceOf[Eq[AsyncCallbackEffects.asyncCallbackParallel.F[A]]]
+
+  checkAll("Parallel[AsyncCallback]", ParallelTests[AsyncCallback].parallel[Int, String])
+
 }
